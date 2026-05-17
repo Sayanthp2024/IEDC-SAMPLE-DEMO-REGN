@@ -434,77 +434,10 @@ document.getElementById('create-event-form').addEventListener('submit', e => {
 });
 
 // ══════════════════════════════════════════════════════════
-// REGISTER VIEW
+// REGISTER VIEW — handled by register.html (via Copy Link)
+// submitRegistration is kept here so register.html can use
+// the same localStorage logic if needed.
 // ══════════════════════════════════════════════════════════
-let selectedEventId = null;
-
-function renderRegisterView() {
-  const events   = loadEvents();
-  const list     = document.getElementById('reg-event-list');
-  const form     = document.getElementById('reg-form');
-  const ph       = document.getElementById('reg-placeholder');
-  const success  = document.getElementById('reg-success');
-
-  form.classList.add('hidden');
-  success.classList.add('hidden');
-  ph.classList.remove('hidden');
-  selectedEventId = null;
-
-  if (events.length === 0) {
-    list.innerHTML = `<p style="color:var(--text-3);font-size:0.85rem;">No events yet. <a href="#" id="go-create-link" style="color:var(--accent-3);text-decoration:none;font-weight:600;">Create one?</a></p>`;
-    document.getElementById('go-create-link')?.addEventListener('click', e => {
-      e.preventDefault();
-      openModal();
-    });
-    return;
-  }
-
-  list.innerHTML = events.map(ev => `
-    <div class="reg-event-item" data-id="${ev.id}" onclick="selectEventForReg('${ev.id}')">
-      <div class="rei-title">${escHtml(ev.title)}</div>
-      <div class="rei-date">${fmtDate(ev.date)}</div>
-    </div>
-  `).join('');
-}
-
-function selectEventForReg(eventId) {
-  const events = loadEvents();
-  const ev = events.find(e => e.id === eventId);
-  if (!ev) return;
-
-  selectedEventId = eventId;
-
-  // highlight item
-  document.querySelectorAll('.reg-event-item').forEach(el => {
-    el.classList.toggle('selected', el.dataset.id === eventId);
-  });
-
-  // show form
-  document.getElementById('reg-placeholder').classList.add('hidden');
-  document.getElementById('reg-success').classList.add('hidden');
-  const form = document.getElementById('reg-form');
-  form.classList.remove('hidden');
-  form.reset();
-
-  const info = document.getElementById('reg-selected-info');
-  info.innerHTML = `
-    <div class="sei-title">${escHtml(ev.title)}</div>
-    <div class="sei-meta">
-      📅 ${fmtDate(ev.date)}${ev.time ? ' · 🕐 ' + fmtTime(ev.time) : ''}${ev.venue ? ' · 📍 ' + escHtml(ev.venue) : ''}
-    </div>`;
-
-  // Check seat availability
-  const regs  = loadRegs();
-  const count = regs.filter(r => r.eventId === eventId).length;
-  if (ev.seats && count >= ev.seats) {
-    document.getElementById('reg-submit').disabled = true;
-    document.getElementById('reg-submit').textContent = 'Seats full 😔';
-  } else {
-    document.getElementById('reg-submit').disabled = false;
-    document.getElementById('reg-submit').textContent = 'Register Now';
-  }
-}
-
 function submitRegistration(eventId, formFields) {
   const events = loadEvents();
   const ev     = events.find(e => e.id === eventId);
@@ -530,37 +463,6 @@ function submitRegistration(eventId, formFields) {
   saveRegs(regs);
   return { ok: true, reg, ev };
 }
-
-document.getElementById('reg-form').addEventListener('submit', e => {
-  e.preventDefault();
-  if (!selectedEventId) return;
-
-  const result = submitRegistration(selectedEventId, {
-    name:      document.getElementById('reg-name').value.trim(),
-    className: document.getElementById('reg-class').value.trim(),
-    rollno:    document.getElementById('reg-rollno').value.trim(),
-    admission: document.getElementById('reg-admission').value.trim(),
-    email:     document.getElementById('reg-email').value.trim().toLowerCase(),
-    phone:     document.getElementById('reg-phone').value.trim(),
-  });
-
-  if (!result.ok) return showToast(result.msg, 'error');
-
-  // Show success
-  document.getElementById('reg-form').classList.add('hidden');
-  document.getElementById('reg-placeholder').classList.add('hidden');
-  const successEl = document.getElementById('reg-success');
-  successEl.classList.remove('hidden');
-  document.getElementById('reg-success-msg').textContent =
-    `${result.reg.name}, you're registered for "${result.ev.title}" on ${fmtDate(result.ev.date)}. See you there!`;
-
-  showToast('Registration successful! 🎉', 'success');
-  renderDashboard();
-});
-
-document.getElementById('reg-again').addEventListener('click', () => {
-  renderRegisterView();
-});
 
 // ══════════════════════════════════════════════════════════
 // RESPONSES VIEW
