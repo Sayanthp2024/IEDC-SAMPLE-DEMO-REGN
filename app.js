@@ -667,7 +667,6 @@ document.getElementById('reg-form').addEventListener('submit', async e => {
       eventId: selectedEventId, eventName: ev.title, name,
       className: document.getElementById('reg-class').value.trim(),
       rollno,
-      admission: document.getElementById('reg-admission').value.trim(),
       email:     document.getElementById('reg-email').value.trim().toLowerCase(),
       phone:     document.getElementById('reg-phone').value.trim(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -727,13 +726,12 @@ function renderResponsesTable() {
     <tr>
       <td>${i+1}</td>
       <td>${escHtml(r.name)}</td>
-      <td>${r.className ? escHtml(r.className) : 'â€”'}</td>
-      <td>${r.rollno   ? escHtml(r.rollno.toUpperCase())  : 'â€”'}</td>
-      <td>${r.admission? escHtml(r.admission) : 'â€”'}</td>
+      <td>${r.className ? escHtml(r.className) : '—'}</td>
+      <td>${r.rollno   ? escHtml(r.rollno.toUpperCase())  : '—'}</td>
       <td>${escHtml(r.email||'')}</td>
       <td><span class="event-pill" title="${escHtml(r.eventName)}">${escHtml(r.eventName)}</span></td>
       <td class="ts-cell">${fmtTS(r.createdAt)}</td>
-      <td><button class="del-btn" title="Delete" onclick="deleteReg('${r.id}')">ðŸ—‘</button></td>
+      <td><button class="del-btn" title="Delete" onclick="deleteReg('${r.id}')">🗑️</button></td>
     </tr>`).join('');
 }
 
@@ -765,7 +763,6 @@ function exportExcel() {
       'Name': r.name,
       'Class/Semester': r.className || '',
       'Roll No': r.rollno ? r.rollno.toUpperCase() : '',
-      'Admission ID': r.admission || '',
       'Email': r.email || '',
       'Phone': r.phone || '',
       'Event Name': r.eventName,

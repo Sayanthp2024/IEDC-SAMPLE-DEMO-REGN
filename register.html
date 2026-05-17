@@ -73,10 +73,6 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="rp-admission">Admission / College ID *</label>
-            <input type="text" id="rp-admission" placeholder="e.g. ADM2022001" required />
-          </div>
-          <div class="form-group">
             <label for="rp-email">Email *</label>
             <input type="email" id="rp-email" placeholder="your@email.com" required />
           </div>
@@ -265,7 +261,6 @@
           name,
           className: document.getElementById('rp-class').value.trim(),
           rollno,
-          admission: document.getElementById('rp-admission').value.trim(),
           email:     document.getElementById('rp-email').value.trim().toLowerCase(),
           phone:     document.getElementById('rp-phone').value.trim(),
           answers,   // custom field answers
