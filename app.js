@@ -266,13 +266,15 @@ function showToast(msg, type = 'default') {
 }
 
 // ── View navigation ──────────────────────────────────────
-const VIEWS = ['dashboard', 'register', 'responses'];
+// Only 'dashboard' and 'responses' exist in index.html as tabs/sections.
+const VIEWS = ['dashboard', 'responses'];
 function switchView(name) {
   VIEWS.forEach(v => {
-    document.getElementById(`view-${v}`).classList.toggle('active', v === name);
-    document.getElementById(`tab-${v}`).classList.toggle('active', v === name);
+    const viewEl = document.getElementById(`view-${v}`);
+    const tabEl  = document.getElementById(`tab-${v}`);
+    if (viewEl) viewEl.classList.toggle('active', v === name);
+    if (tabEl)  tabEl.classList.toggle('active', v === name);
   });
-  if (name === 'register')  renderRegisterView();
   if (name === 'responses') renderResponsesView();
   if (name === 'dashboard') renderDashboard();
 }
@@ -633,6 +635,41 @@ function deleteReg(regId) {
 
 document.getElementById('filter-event').addEventListener('change', renderResponsesTable);
 document.getElementById('filter-search').addEventListener('input',  renderResponsesTable);
+
+// ── Excel Export ─────────────────────────────────────────
+document.getElementById('exportExcelBtn').addEventListener('click', () => {
+  const regs   = loadRegs();
+  const events = loadEvents();
+  const eventId = document.getElementById('filter-event').value;
+  const query   = document.getElementById('filter-search').value.toLowerCase().trim();
+
+  let filtered = regs;
+  if (eventId !== 'all') filtered = filtered.filter(r => r.eventId === eventId);
+  if (query)             filtered = filtered.filter(r =>
+    r.name.toLowerCase().includes(query) || r.email.toLowerCase().includes(query)
+  );
+
+  if (filtered.length === 0) return showToast('No data to export.', 'error');
+
+  const rows = filtered.map((r, i) => ({
+    '#':             i + 1,
+    'Name':          r.name || '',
+    'Class':         r.className || '',
+    'Roll No':       r.rollno || '',
+    'Admission No':  r.admission || '',
+    'Email':         r.email || '',
+    'Phone':         r.phone || '',
+    'Event':         r.eventName || '',
+    'Registered At': r.createdAt ? new Date(r.createdAt).toLocaleString('en-IN') : '',
+  }));
+
+  const ws  = XLSX.utils.json_to_sheet(rows);
+  const wb  = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Registrations');
+  const fileName = `IEDC_Registrations_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  showToast(`Exported ${filtered.length} registrations ✅`, 'success');
+});
 
 // ══════════════════════════════════════════════════════════
 // NAV TABS
