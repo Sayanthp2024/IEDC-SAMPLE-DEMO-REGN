@@ -505,16 +505,16 @@ function renderDashboard() {
       <article class="event-card" data-id="${ev.id}">
         <span class="card-category cat-${ev.category}">${ev.category}</span>
         <div class="card-title">${escHtml(ev.title)}</div>
-        <div class="card-desc">${ev.desc ? escHtml(ev.desc).slice(0,100) + (ev.desc.length>100?'â€¦':'') : 'No description provided.'}</div>
+        <div class="card-desc">${ev.desc ? escHtml(ev.desc).slice(0,100) + (ev.desc.length>100?'…':'') : 'No description provided.'}</div>
         <div class="card-meta">
-          <span class="meta-item"><span class="meta-icon">ðŸ“…</span>${fmtDate(ev.date)}</span>
-          ${ev.time  ? `<span class="meta-item"><span class="meta-icon">ðŸ•</span>${fmtTime(ev.time)}</span>` : ''}
-          ${ev.venue ? `<span class="meta-item"><span class="meta-icon">ðŸ“</span>${escHtml(ev.venue)}</span>` : ''}
+          <span class="meta-item"><span class="meta-icon">📅</span>${fmtDate(ev.date)}</span>
+          ${ev.time  ? `<span class="meta-item"><span class="meta-icon">🕐</span>${fmtTime(ev.time)}</span>` : ''}
+          ${ev.venue ? `<span class="meta-item"><span class="meta-icon">📍</span>${escHtml(ev.venue)}</span>` : ''}
         </div>
         <div class="card-footer">
-          <span class="reg-count">âœ… ${seatInfo}</span>
+          <span class="reg-count">✅ ${seatInfo}</span>
           <div class="card-actions">
-            <button class="action-btn link-btn" onclick="copyLink('${ev.id}')">ðŸ”— Copy Link</button>
+            <button class="action-btn link-btn" onclick="copyLink('${ev.id}')">🔗 Copy Link</button>
             <button class="action-btn" onclick="goResponses('${ev.id}')">Responses</button>
             <button class="action-btn danger" onclick="deleteEvent('${ev.id}')">Delete</button>
           </div>
@@ -526,7 +526,7 @@ function renderDashboard() {
 function copyLink(eventId) {
   const base = window.location.href.replace(/\/[^/]*(\?.*)?$/, '').replace(/index\.html$/, '');
   const url  = `${base}/register.html?id=${eventId}`;
-  navigator.clipboard.writeText(url).then(() => showToast('Link copied! ðŸ”—', 'success'))
+  navigator.clipboard.writeText(url).then(() => showToast('Link copied! 🔗', 'success'))
     .catch(() => prompt('Copy this link:', url));
 }
 
@@ -577,7 +577,7 @@ document.getElementById('create-event-form').addEventListener('submit', async e 
   if (!title || !date) return showToast('Title and date are required.', 'error');
 
   const btn = e.target.querySelector('button[type="submit"]');
-  btn.disabled = true; btn.textContent = 'Creatingâ€¦';
+  btn.disabled = true; btn.textContent = 'Creating…';
 
   try {
     await db.collection('events').add({
@@ -590,7 +590,7 @@ document.getElementById('create-event-form').addEventListener('submit', async e 
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
     closeModal();
-    showToast(`"${title}" created! ðŸŽ‰`, 'success');
+    showToast(`"${title}" created! 🎉`, 'success');
   } catch(err) {
     console.error(err);
     showToast('Error creating event. Check Firebase config.', 'error');
@@ -677,7 +677,7 @@ document.getElementById('reg-form').addEventListener('submit', async e => {
     document.getElementById('reg-success').classList.remove('hidden');
     document.getElementById('reg-success-msg').textContent =
       `${name}, you're registered for "${ev.title}" on ${fmtDate(ev.date)}. See you there!`;
-    showToast('Registration successful! ðŸŽ‰', 'success');
+    showToast('Registration successful! 🎉', 'success');
 
   } catch(err) {
     console.error(err); showToast('Submission failed. Try again.','error');

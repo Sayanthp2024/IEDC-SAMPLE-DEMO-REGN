@@ -21,7 +21,6 @@
       </div>
       <div class="nav-tabs">
         <button class="nav-tab active" data-view="dashboard" id="tab-dashboard">Dashboard</button>
-        <button class="nav-tab" data-view="register" id="tab-register">Register</button>
         <button class="nav-tab" data-view="responses" id="tab-responses">Responses</button>
       </div>
       <div class="nav-right-actions">
@@ -56,58 +55,6 @@
       </div>
     </section>
 
-    <!-- REGISTER VIEW -->
-    <section id="view-register" class="view">
-      <div class="page-header">
-        <h2>Register for an Event</h2>
-        <p>Pick an event below and fill in your details.</p>
-      </div>
-      <div class="register-layout">
-        <div class="event-picker" id="reg-event-picker">
-          <p class="picker-label">Select event</p>
-          <div id="reg-event-list"></div>
-        </div>
-        <div class="register-form-card" id="reg-form-card">
-          <div class="form-placeholder" id="reg-placeholder">
-            <span>👈</span>
-            <p>Select an event to register</p>
-          </div>
-          <form id="reg-form" class="hidden">
-            <div class="selected-event-info" id="reg-selected-info"></div>
-            <div class="form-group">
-              <label for="reg-name">Full Name *</label>
-              <input type="text" id="reg-name" placeholder="Your full name" required />
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="reg-class">Class / Semester *</label>
-                <input type="text" id="reg-class" placeholder="e.g. S3 CSE" required />
-              </div>
-              <div class="form-group">
-                <label for="reg-rollno">Roll Number *</label>
-                <input type="text" id="reg-rollno" placeholder="e.g. 22CS001" required />
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="reg-email">Email *</label>
-              <input type="email" id="reg-email" placeholder="your@email.com" required />
-            </div>
-            <div class="form-group">
-              <label for="reg-phone">Phone *</label>
-              <input type="tel" id="reg-phone" placeholder="+91 98765 43210" required />
-            </div>
-            <button type="submit" class="btn-primary btn-full" id="reg-submit">Register Now</button>
-          </form>
-          <div id="reg-success" class="hidden success-card">
-            <div class="success-icon">🎉</div>
-            <h3>You're registered!</h3>
-            <p id="reg-success-msg"></p>
-            <button class="btn-outline btn-full" id="reg-again">Register for another event</button>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- RESPONSES VIEW -->
     <section id="view-responses" class="view">
