@@ -397,6 +397,7 @@ textarea {
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
+  appearance: none;
 }
 input:focus, select:focus, textarea:focus {
   border-color: var(--accent);
