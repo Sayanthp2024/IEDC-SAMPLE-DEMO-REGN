@@ -745,8 +745,69 @@ async function deleteReg(regId) {
   } catch(err) { console.error(err); showToast('Error removing.','error'); }
 }
 
+function exportExcel() {
+  const regs = loadRegs();
+  const eventId = document.getElementById('filter-event').value;
+  const query = document.getElementById('filter-search').value.toLowerCase().trim();
+
+  let filtered = regs;
+  if (eventId !== 'all') filtered = filtered.filter(r => r.eventId === eventId);
+  if (query) filtered = filtered.filter(r =>
+    r.name.toLowerCase().includes(query) || (r.email||'').toLowerCase().includes(query) || (r.rollno||'').toLowerCase().includes(query)
+  );
+
+  if (filtered.length === 0) return showToast('No data to export', 'error');
+
+  // Format data for Excel
+  const data = filtered.map((r, i) => {
+    const row = {
+      'S.No': i + 1,
+      'Name': r.name,
+      'Class/Semester': r.className || '',
+      'Roll No': r.rollno ? r.rollno.toUpperCase() : '',
+      'Admission ID': r.admission || '',
+      'Email': r.email || '',
+      'Phone': r.phone || '',
+      'Event Name': r.eventName,
+      'Registered At': r.createdAt ? new Date(r.createdAt.toDate ? r.createdAt.toDate() : r.createdAt).toLocaleString('en-IN') : ''
+    };
+
+    // Add any custom field answers dynamically
+    if (r.answers) {
+      // Find the event to get the custom field labels
+      const ev = loadEvents().find(e => e.id === r.eventId);
+      if (ev && ev.customFields) {
+        ev.customFields.forEach(cf => {
+          if (r.answers[cf.id] !== undefined) {
+            row[cf.label] = r.answers[cf.id];
+          }
+        });
+      } else {
+        // Fallback if event is deleted but registration remains
+        Object.keys(r.answers).forEach(k => {
+          row[`Custom Field (${k})`] = r.answers[k];
+        });
+      }
+    }
+    return row;
+  });
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Registrations");
+
+  let filename = "IEDC_Registrations.xlsx";
+  if (eventId !== 'all') {
+    const ev = loadEvents().find(e => e.id === eventId);
+    if (ev) filename = `${ev.title.replace(/[^a-z0-9]/gi, '_')}_Registrations.xlsx`;
+  }
+
+  XLSX.writeFile(wb, filename);
+}
+
 document.getElementById('filter-event').addEventListener('change', renderResponsesTable);
 document.getElementById('filter-search').addEventListener('input',  renderResponsesTable);
+document.getElementById('exportExcelBtn').addEventListener('click', exportExcel);
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // NAV TABS

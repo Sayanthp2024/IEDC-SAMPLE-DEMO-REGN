@@ -122,7 +122,10 @@
           </select>
           <input type="search" id="filter-search" class="search-input" placeholder="🔍  Search by name or email…" />
         </div>
-        <div class="responses-meta" id="responses-meta">0 registrations</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="responses-meta" id="responses-meta">0 registrations</div>
+          <button class="btn-export" id="exportExcelBtn" title="Download as Excel">📥 Export Excel</button>
+        </div>
       </div>
       <div id="responses-table-wrap">
         <div class="empty-state" id="empty-responses">
@@ -286,6 +289,8 @@
     </div>
   </div>
 
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>

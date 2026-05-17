@@ -145,6 +145,17 @@ body::before {
 }
 .btn-ghost:hover { color: var(--text-1); background: var(--surface2); }
 
+.btn-export {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399; border-radius: var(--radius);
+  font-family: var(--font); font-size: 0.85rem; font-weight: 600;
+  padding: 8px 16px; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-export:hover { background: rgba(16, 185, 129, 0.25); border-color: #34d399; }
+
 /* ══════════════ MAIN / VIEWS ══════════════ */
 main {
   position: relative; z-index: 1;
