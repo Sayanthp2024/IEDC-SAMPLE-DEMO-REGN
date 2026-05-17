@@ -514,13 +514,20 @@ function renderDashboard() {
         <div class="card-footer">
           <span class="reg-count">✅ ${seatInfo}</span>
           <div class="card-actions">
-            <button class="action-btn link-btn" onclick="copyLink('${ev.id}')">🔗 Copy Link</button>
+            <button class="action-btn link-btn" onclick="openLink('${ev.id}')">↗️ Open</button>
+            <button class="action-btn link-btn" onclick="copyLink('${ev.id}')">🔗 Copy</button>
             <button class="action-btn" onclick="goResponses('${ev.id}')">Responses</button>
             <button class="action-btn danger" onclick="deleteEvent('${ev.id}')">Delete</button>
           </div>
         </div>
       </article>`;
   }).join('');
+}
+
+function openLink(eventId) {
+  const base = window.location.href.replace(/\/[^/]*(\?.*)?$/, '').replace(/index\.html$/, '');
+  const url  = `${base}/register.html?id=${eventId}`;
+  window.open(url, '_blank');
 }
 
 function copyLink(eventId) {
@@ -550,53 +557,6 @@ async function deleteEvent(eventId) {
   } catch(err) { console.error(err); showToast('Error deleting event.', 'error'); }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// CREATE EVENT MODAL
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function openModal() {
-  document.getElementById('modal-overlay').classList.remove('hidden');
-  document.getElementById('modal-overlay').classList.add('visible');
-  document.getElementById('ev-date').value = new Date().toISOString().split('T')[0];
-}
-function closeModal() {
-  document.getElementById('modal-overlay').classList.add('hidden');
-  document.getElementById('create-event-form').reset();
-}
-document.getElementById('openCreateModal').addEventListener('click', openModal);
-document.getElementById('heroCreate').addEventListener('click', openModal);
-document.getElementById('closeModal').addEventListener('click', closeModal);
-document.getElementById('cancelModal').addEventListener('click', closeModal);
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
-
-document.getElementById('create-event-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const title = document.getElementById('ev-title').value.trim();
-  const date  = document.getElementById('ev-date').value;
-  if (!title || !date) return showToast('Title and date are required.', 'error');
-
-  const btn = e.target.querySelector('button[type="submit"]');
-  btn.disabled = true; btn.textContent = 'Creating…';
-
-  try {
-    await db.collection('events').add({
-      title, date,
-      time:      document.getElementById('ev-time').value,
-      venue:     document.getElementById('ev-venue').value.trim(),
-      desc:      document.getElementById('ev-desc').value.trim(),
-      category:  document.getElementById('ev-category').value,
-      seats:     document.getElementById('ev-seats').value ? +document.getElementById('ev-seats').value : null,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-    closeModal();
-    showToast(`"${title}" created! 🎉`, 'success');
-  } catch(err) {
-    console.error(err);
-    showToast('Error creating event. Check Firebase config.', 'error');
-  }
-  btn.disabled = false; btn.textContent = 'Create Event';
-});
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // REGISTER VIEW (in-app)
