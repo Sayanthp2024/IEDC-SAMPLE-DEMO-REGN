@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EventFlow — IEDC Event Manager</title>
+  <meta name="description" content="Create events, collect registrations, and manage responses — all in one place." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">EventFlow</span>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-view="dashboard" id="tab-dashboard">Dashboard</button>
+        <button class="nav-tab" data-view="register" id="tab-register">Register</button>
+        <button class="nav-tab" data-view="responses" id="tab-responses">Responses</button>
+      </div>
+      <div class="nav-right-actions">
+        <button class="btn-ghost btn-sm icon-btn" id="openChangePwModal" title="Change password">🔑</button>
+        <button class="btn-lock" id="lockBtn" title="Lock admin">🔒 Lock</button>
+        <button class="btn-primary btn-sm" id="openCreateModal">+ New Event</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── VIEWS ── -->
+  <main>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view active">
+      <div class="hero">
+        <div class="hero-badge">IEDC · Event Manager</div>
+        <h1 class="hero-title">Run events that <span class="gradient-text">actually work.</span></h1>
+        <p class="hero-sub">Create an event in seconds. Share a link. Watch registrations roll in.</p>
+        <button class="btn-primary btn-lg" id="heroCreate">Create your first event →</button>
+      </div>
+
+      <div class="section-header">
+        <h2>Your Events</h2>
+        <span id="event-count-badge" class="badge">0 events</span>
+      </div>
+      <div id="events-grid" class="events-grid">
+        <div class="empty-state" id="empty-events">
+          <div class="empty-icon">📅</div>
+          <p>No events yet. Create one to get started!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTER VIEW -->
+    <section id="view-register" class="view">
+      <div class="page-header">
+        <h2>Register for an Event</h2>
+        <p>Pick an event below and fill in your details.</p>
+      </div>
+      <div class="register-layout">
+        <div class="event-picker" id="reg-event-picker">
+          <p class="picker-label">Select event</p>
+          <div id="reg-event-list"></div>
+        </div>
+        <div class="register-form-card" id="reg-form-card">
+          <div class="form-placeholder" id="reg-placeholder">
+            <span>👈</span>
+            <p>Select an event to register</p>
+          </div>
+          <form id="reg-form" class="hidden">
+            <div class="selected-event-info" id="reg-selected-info"></div>
+            <div class="form-group">
+              <label for="reg-name">Full Name *</label>
+              <input type="text" id="reg-name" placeholder="Your full name" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-class">Class / Semester *</label>
+                <input type="text" id="reg-class" placeholder="e.g. S3 CSE" required />
+              </div>
+              <div class="form-group">
+                <label for="reg-rollno">Roll Number *</label>
+                <input type="text" id="reg-rollno" placeholder="e.g. 22CS001" required />
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="reg-email">Email *</label>
+              <input type="email" id="reg-email" placeholder="your@email.com" required />
+            </div>
+            <div class="form-group">
+              <label for="reg-phone">Phone <span class="label-opt">(optional)</span></label>
+              <input type="tel" id="reg-phone" placeholder="+91 98765 43210" />
+            </div>
+            <button type="submit" class="btn-primary btn-full" id="reg-submit">Register Now</button>
+          </form>
+          <div id="reg-success" class="hidden success-card">
+            <div class="success-icon">🎉</div>
+            <h3>You're registered!</h3>
+            <p id="reg-success-msg"></p>
+            <button class="btn-outline btn-full" id="reg-again">Register for another event</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESPONSES VIEW -->
+    <section id="view-responses" class="view">
+      <div class="page-header">
+        <h2>Manage Responses</h2>
+        <p>View and filter registrations across all events.</p>
+      </div>
+      <div class="responses-controls">
+        <div class="filter-bar">
+          <select id="filter-event" class="select-input">
+            <option value="all">All Events</option>
+          </select>
+          <input type="search" id="filter-search" class="search-input" placeholder="🔍  Search by name or email…" />
+        </div>
+        <div class="responses-meta" id="responses-meta">0 registrations</div>
+      </div>
+      <div id="responses-table-wrap">
+        <div class="empty-state" id="empty-responses">
+          <div class="empty-icon">📋</div>
+          <p>No registrations yet.</p>
+        </div>
+        <table class="responses-table hidden" id="responses-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Class</th>
+              <th>Roll No</th>
+              <th>Admission ID</th>
+              <th>Email</th>
+              <th>Event</th>
+              <th>Registered</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="responses-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── CREATE EVENT MODAL ── -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal modal-wide" id="create-modal">
+      <div class="modal-header">
+        <h3>Create New Event</h3>
+        <button class="modal-close" id="closeModal">✕</button>
+      </div>
+      <form id="create-event-form">
+        <div class="form-group">
+          <label for="ev-title">Event Title *</label>
+          <input type="text" id="ev-title" placeholder="e.g. HackFest 2026" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ev-date">Date *</label>
+            <input type="date" id="ev-date" required />
+          </div>
+          <div class="form-group">
+            <label for="ev-time">Time</label>
+            <input type="time" id="ev-time" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ev-venue">Venue</label>
+          <input type="text" id="ev-venue" placeholder="e.g. Seminar Hall, Main Block" />
+        </div>
+        <div class="form-group">
+          <label for="ev-desc">Description</label>
+          <textarea id="ev-desc" rows="3" placeholder="What's this event about?"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ev-category">Category</label>
+            <select id="ev-category">
+              <option value="Tech">Tech</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ev-seats">Seat Limit <span class="label-opt">(leave blank = unlimited)</span></label>
+            <input type="number" id="ev-seats" placeholder="e.g. 50" min="1" />
+          </div>
+        </div>
+
+        <!-- ── FORM BUILDER ── -->
+        <div class="form-builder-section">
+          <div class="fb-header">
+            <div>
+              <div class="fb-title">📋 Registration Form Fields</div>
+              <div class="fb-sub">Fixed fields are always included. Add custom questions below.</div>
+            </div>
+            <button type="button" class="btn-add-field" id="addFieldBtn">+ Add Question</button>
+          </div>
+
+          <!-- Fixed fields preview -->
+          <div class="fb-fixed-fields">
+            <span class="fb-fixed-chip">Full Name</span>
+            <span class="fb-fixed-chip">Class</span>
+            <span class="fb-fixed-chip">Roll No</span>
+            <span class="fb-fixed-chip">Admission ID</span>
+            <span class="fb-fixed-chip">Email</span>
+            <span class="fb-fixed-chip">Phone</span>
+          </div>
+
+          <!-- Custom fields list -->
+          <div id="custom-fields-list"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn-primary">Create Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- ══════════════════════════════════════════════
+       LOGIN GATE OVERLAY
+  ══════════════════════════════════════════════ -->
+  <div id="login-gate" class="login-gate">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="brand-icon lg">⚡</span>
+      </div>
+      <div class="login-badge">Admin Access</div>
+      <h2 class="login-title">EventFlow</h2>
+      <p class="login-sub">Enter your password to access the admin dashboard.</p>
+
+      <form id="login-form" autocomplete="off">
+        <div class="form-group" style="position:relative;">
+          <label for="login-pw">Password</label>
+          <input type="password" id="login-pw" placeholder="Enter admin password" required autocomplete="current-password" />
+          <button type="button" class="pw-toggle" id="toggle-login-pw" tabindex="-1">👁</button>
+        </div>
+        <div id="login-error" class="login-error hidden">Incorrect password. Try again.</div>
+        <button type="submit" class="btn-primary btn-full" id="login-btn">Unlock Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── CHANGE PASSWORD MODAL ── -->
+  <div class="modal-overlay hidden" id="changepw-modal-overlay">
+    <div class="modal" id="changepw-modal">
+      <div class="modal-header">
+        <h3>🔑 Change Password</h3>
+        <button class="modal-close" id="closeChangePwModal">✕</button>
+      </div>
+      <form id="changepw-form" style="padding: 24px 28px 0;">
+        <div class="form-group" style="position:relative;">
+          <label for="cpw-current">Current Password *</label>
+          <input type="password" id="cpw-current" placeholder="Current password" required />
+        </div>
+        <div class="form-group" style="position:relative;">
+          <label for="cpw-new">New Password *</label>
+          <input type="password" id="cpw-new" placeholder="Min. 6 characters" required minlength="6" />
+        </div>
+        <div class="form-group" style="position:relative;">
+          <label for="cpw-confirm">Confirm New Password *</label>
+          <input type="password" id="cpw-confirm" placeholder="Repeat new password" required minlength="6" />
+        </div>
+        <div id="cpw-error" class="login-error hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelChangePw">Cancel</button>
+          <button type="submit" class="btn-primary">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

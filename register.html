@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — EventFlow</title>
+  <meta name="description" content="Register for an IEDC event." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .reg-page-wrap { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 24px 80px; }
+    .reg-page-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); width:100%; max-width:520px; overflow:hidden; box-shadow:var(--shadow-xl); animation:fadeSlide 0.4s ease; }
+    .reg-page-banner { background:linear-gradient(135deg,var(--accent),var(--cyan)); padding:28px 32px; position:relative; overflow:hidden; }
+    .reg-page-banner::before { content:'⚡'; position:absolute; right:20px; top:50%; transform:translateY(-50%); font-size:5rem; opacity:0.15; }
+    .rpb-org   { font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.7); margin-bottom:6px; }
+    .rpb-title { font-size:1.5rem; font-weight:800; color:#fff; line-height:1.2; }
+    .rpb-meta  { font-size:0.82rem; color:rgba(255,255,255,0.8); margin-top:8px; display:flex; flex-wrap:wrap; gap:12px; }
+    .reg-page-body { padding:32px; }
+    .rp-seats-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:var(--green); font-size:0.8rem; font-weight:600; padding:6px 14px; border-radius:999px; margin-bottom:24px; }
+    .rp-seats-badge.full { background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.3); color:var(--rose); }
+    .mini-nav { background:rgba(10,11,15,0.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; }
+    .mini-nav .brand { display:flex; align-items:center; gap:8px; font-weight:700; font-size:1rem; text-decoration:none; color:var(--text-1); }
+    .mini-nav .back-link { font-size:0.82rem; color:var(--text-2); text-decoration:none; transition:color 0.2s; }
+    .mini-nav .back-link:hover { color:var(--accent-3); }
+    #rp-success,#rp-error { text-align:center; padding:40px 24px; }
+    .rp-big-icon { font-size:3.5rem; margin-bottom:16px; animation:pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    #rp-success h2,#rp-error h2 { font-size:1.4rem; font-weight:800; margin-bottom:8px; }
+    #rp-success p, #rp-error p  { color:var(--text-2); font-size:0.9rem; line-height:1.6; }
+    .divider { text-align:center; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-3); margin:20px 0; display:flex; align-items:center; gap:12px; }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <nav class="mini-nav">
+    <a class="brand" href="index.html"><span class="brand-icon">⚡</span> EventFlow</a>
+    <a class="back-link" href="index.html">← Back to dashboard</a>
+  </nav>
+
+  <div class="reg-page-wrap">
+    <div class="reg-page-card" id="rp-card">
+
+      <div id="rp-loading" style="padding:60px;text-align:center;color:var(--text-3);">
+        <div style="font-size:2rem;margin-bottom:12px;animation:spin 1s linear infinite;display:inline-block;">⚡</div>
+        <p style="font-size:0.9rem;">Loading event…</p>
+      </div>
+
+      <div class="reg-page-banner hidden" id="rp-banner">
+        <div class="rpb-org">IEDC · Event Registration</div>
+        <div class="rpb-title" id="rpb-title"></div>
+        <div class="rpb-meta"  id="rpb-meta"></div>
+      </div>
+
+      <div class="reg-page-body hidden" id="rp-body">
+        <div id="rp-seats-badge" class="rp-seats-badge">✅ Seats available</div>
+        <form id="rp-form">
+          <!-- Fixed fields -->
+          <div class="form-group">
+            <label for="rp-name">Full Name *</label>
+            <input type="text" id="rp-name" placeholder="Your full name" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rp-class">Class / Semester *</label>
+              <input type="text" id="rp-class" placeholder="e.g. S3 CSE" required />
+            </div>
+            <div class="form-group">
+              <label for="rp-rollno">Roll Number *</label>
+              <input type="text" id="rp-rollno" placeholder="e.g. 22CS001" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rp-admission">Admission / College ID *</label>
+            <input type="text" id="rp-admission" placeholder="e.g. ADM2022001" required />
+          </div>
+          <div class="form-group">
+            <label for="rp-email">Email *</label>
+            <input type="email" id="rp-email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label for="rp-phone">Phone <span class="label-opt">(optional)</span></label>
+            <input type="tel" id="rp-phone" placeholder="+91 98765 43210" />
+          </div>
+          <!-- Custom fields injected here -->
+          <div id="rp-custom-fields"></div>
+          <button type="submit" class="btn-primary btn-full" id="rp-submit">Register Now</button>
+        </form>
+        <div class="divider">— or —</div>
+        <p style="text-align:center;font-size:0.8rem;color:var(--text-3);">Already registered? Check with the organizer.</p>
+      </div>
+
+      <div id="rp-success" class="hidden">
+        <div class="rp-big-icon">🎉</div>
+        <h2>You're registered!</h2>
+        <p id="rp-success-msg"></p>
+        <br />
+        <p style="font-size:0.8rem;color:var(--text-3);">See you at the event! You may close this tab.</p>
+      </div>
+
+      <div id="rp-error" class="hidden" style="padding:60px 32px;">
+        <div class="rp-big-icon">😕</div>
+        <h2>Event not found</h2>
+        <p>This link may be invalid or the event may have been removed.<br />Contact the organizer for a valid registration link.</p>
+        <br />
+        <a class="btn-outline" href="index.html">Go to dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    }
+    function fmtTime(t) {
+      if (!t) return '';
+      const [h,m]=t.split(':'); const hr=+h;
+      return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`;
+    }
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    let _tt;
+    function showToast(msg,type='default'){
+      const el=document.getElementById('toast');
+      el.textContent=msg; el.className=`toast ${type}`; el.classList.remove('hidden');
+      clearTimeout(_tt); _tt=setTimeout(()=>el.classList.add('hidden'),3500);
+    }
+
+    const params   = new URLSearchParams(window.location.search);
+    const eventId  = params.get('id');
+    const loading  = document.getElementById('rp-loading');
+    const banner   = document.getElementById('rp-banner');
+    const bodyEl   = document.getElementById('rp-body');
+    const errorEl  = document.getElementById('rp-error');
+    const successEl= document.getElementById('rp-success');
+    let currentEvent = null;
+
+    // ── Render custom fields ──────────────────────────────
+    function renderCustomFields(fields) {
+      const container = document.getElementById('rp-custom-fields');
+      container.innerHTML = '';
+      (fields||[]).forEach(f => {
+        const wrap = document.createElement('div');
+        wrap.className = 'dyn-field-group';
+        const req  = f.required ? '<span class="required-star">*</span>' : '<span class="label-opt"> (optional)</span>';
+        let input  = '';
+        if (f.type === 'text') {
+          input = `<input type="text" id="cf-${f.id}" placeholder="Your answer" ${f.required?'required':''} />`;
+        } else if (f.type === 'number') {
+          input = `<input type="number" id="cf-${f.id}" placeholder="Your answer" ${f.required?'required':''} />`;
+        } else if (f.type === 'paragraph') {
+          input = `<textarea id="cf-${f.id}" rows="3" placeholder="Your answer" ${f.required?'required':''}></textarea>`;
+        } else if (f.type === 'choice') {
+          input = `<div class="choice-options">${(f.options||[]).map(opt =>
+            `<label class="choice-option"><input type="radio" name="cf-${f.id}" value="${escHtml(opt)}" ${f.required?'required':''} />${escHtml(opt)}</label>`).join('')}</div>`;
+        } else if (f.type === 'checkbox') {
+          input = `<div class="choice-options">${(f.options||[]).map(opt =>
+            `<label class="choice-option"><input type="checkbox" name="cf-${f.id}" value="${escHtml(opt)}" />${escHtml(opt)}</label>`).join('')}</div>`;
+        } else if (f.type === 'dropdown') {
+          input = `<select id="cf-${f.id}" ${f.required?'required':''}><option value="">Select an option</option>${(f.options||[]).map(o=>`<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('')}</select>`;
+        }
+        wrap.innerHTML = `<label>${escHtml(f.label)}${req}</label>${input}`;
+        container.appendChild(wrap);
+      });
+    }
+
+    function collectCustomAnswers(fields) {
+      const answers = {};
+      for (const f of (fields||[])) {
+        if (f.type === 'checkbox') {
+          const checked = [...document.querySelectorAll(`input[name="cf-${f.id}"]:checked`)].map(el => el.value);
+          if (f.required && checked.length === 0) { showToast(`"${f.label}" is required.`,'error'); return null; }
+          answers[f.id] = checked.join(', ');
+        } else if (f.type === 'choice') {
+          const sel = document.querySelector(`input[name="cf-${f.id}"]:checked`);
+          if (f.required && !sel) { showToast(`"${f.label}" is required.`,'error'); return null; }
+          answers[f.id] = sel ? sel.value : '';
+        } else {
+          const el = document.getElementById(`cf-${f.id}`);
+          if (!el) continue;
+          if (f.required && !el.value.trim()) { showToast(`"${f.label}" is required.`,'error'); return null; }
+          answers[f.id] = el.value.trim();
+        }
+      }
+      return answers;
+    }
+
+    // ── Init ──────────────────────────────────────────────
+    async function init() {
+      if (!eventId) { loading.classList.add('hidden'); errorEl.classList.remove('hidden'); return; }
+      try {
+        const evDoc = await db.collection('events').doc(eventId).get();
+        if (!evDoc.exists) { loading.classList.add('hidden'); errorEl.classList.remove('hidden'); return; }
+        currentEvent = { id: evDoc.id, ...evDoc.data() };
+        const ev = currentEvent;
+
+        document.title = `Register — ${ev.title}`;
+        document.getElementById('rpb-title').textContent = ev.title;
+        const meta = [];
+        if (ev.date)  meta.push(`📅 ${fmtDate(ev.date)}`);
+        if (ev.time)  meta.push(`🕐 ${fmtTime(ev.time)}`);
+        if (ev.venue) meta.push(`📍 ${escHtml(ev.venue)}`);
+        document.getElementById('rpb-meta').innerHTML = meta.map(m=>`<span>${m}</span>`).join('');
+
+        const regSnap = await db.collection('registrations').where('eventId','==',eventId).get();
+        const count   = regSnap.size;
+        const badge   = document.getElementById('rp-seats-badge');
+        if (ev.seats) {
+          const left = ev.seats - count;
+          if (left<=0) {
+            badge.textContent='🚫 Seats full'; badge.classList.add('full');
+            document.getElementById('rp-submit').disabled=true;
+            document.getElementById('rp-submit').textContent='Seats full';
+          } else { badge.textContent=`✅ ${left} seat${left!==1?'s':''} remaining`; }
+        } else { badge.textContent=`✅ Open registration · ${count} registered`; }
+
+        renderCustomFields(ev.customFields);
+
+        loading.classList.add('hidden');
+        banner.classList.remove('hidden');
+        bodyEl.classList.remove('hidden');
+      } catch(err) {
+        console.error(err);
+        loading.classList.add('hidden'); errorEl.classList.remove('hidden');
+      }
+    }
+
+    // ── Form submit ───────────────────────────────────────
+    document.getElementById('rp-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn    = document.getElementById('rp-submit');
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      const ev     = currentEvent;
+      const rollno = document.getElementById('rp-rollno').value.trim().toLowerCase();
+
+      // Collect & validate custom field answers
+      const answers = collectCustomAnswers(ev.customFields);
+      if (answers === null) { btn.disabled=false; btn.textContent='Register Now'; return; }
+
+      try {
+        const dup = await db.collection('registrations').where('eventId','==',eventId).where('rollno','==',rollno).get();
+        if (!dup.empty) { showToast('This roll number is already registered.','error'); btn.disabled=false; btn.textContent='Register Now'; return; }
+
+        const snap = await db.collection('registrations').where('eventId','==',eventId).get();
+        if (ev.seats && snap.size >= ev.seats) { showToast('Sorry, seats are full!','error'); btn.disabled=false; btn.textContent='Register Now'; return; }
+
+        const name = document.getElementById('rp-name').value.trim();
+        await db.collection('registrations').add({
+          eventId,
+          eventName: ev.title,
+          name,
+          className: document.getElementById('rp-class').value.trim(),
+          rollno,
+          admission: document.getElementById('rp-admission').value.trim(),
+          email:     document.getElementById('rp-email').value.trim().toLowerCase(),
+          phone:     document.getElementById('rp-phone').value.trim(),
+          answers,   // custom field answers
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
+        bodyEl.classList.add('hidden');
+        banner.classList.add('hidden');
+        successEl.classList.remove('hidden');
+        document.getElementById('rp-success-msg').textContent =
+          `${name} (Roll: ${rollno.toUpperCase()}), you're all set for "${ev.title}" on ${fmtDate(ev.date)}!`;
+
+      } catch(err) {
+        console.error(err);
+        showToast('Submission failed. Try again.','error');
+        btn.disabled=false; btn.textContent='Register Now';
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
